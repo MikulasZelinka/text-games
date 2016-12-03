@@ -181,7 +181,7 @@ class SavingJohnSimulator:
     def Read(self):
         if self.storyNode.text.startswith("A wet strand of hair hinders my vision and I'm back in the water."):
             if self.doShuffle:
-                self.idxShuffle = range(2)
+                self.idxShuffle = list(range(2))
                 random.shuffle(self.idxShuffle)
             idxTemp = 0
             if self.params_path == "Adam": idxTemp = 1
@@ -193,7 +193,7 @@ class SavingJohnSimulator:
             return (self.storyNode.text, [actionsTemp[i] for i in self.idxShuffle] if self.doShuffle else actionsTemp, AssignReward(self.storyNode.text, "savingjohn"))
 
         if self.doShuffle:
-            self.idxShuffle = range(len(self.storyNode.actions))
+            self.idxShuffle = list(range(len(self.storyNode.actions)))
             random.shuffle(self.idxShuffle)
         return (self.storyNode.text, [self.storyNode.actions[i] for i in self.idxShuffle] if self.doShuffle else self.storyNode.actions, AssignReward(self.storyNode.text, "savingjohn"))
 
@@ -447,7 +447,7 @@ class MachineOfDeathSimulator:
         self.text = re.sub("\\n", " ", self.myHTMLParser.MyHTMLFilter(self.text))
         self.actions = [re.sub("\\n", " ", self.myHTMLParser.MyHTMLFilter(action)) for action in self.actions]
         if self.doShuffle:
-            self.idxShuffle = range(len(self.actions))
+            self.idxShuffle = list(range(len(self.actions)))
             random.shuffle(self.idxShuffle)
         if "THE END" in self.text: # the story ends
             self.idxShuffle = []
@@ -2377,7 +2377,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     startTime = time.time()
-    mySimulator, dict_wordId, dict_actionId, maxNumActions = GetSimulator(args.name, args.doShuffle == "True")
+    mySimulator, dict_wordId, dict_actionId, maxNumActions = GetSimulator(args.name, str.lower(args.doShuffle) == "true")
     numEpisode = 0
     numStep = 0
     while numEpisode < 10:
