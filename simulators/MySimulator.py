@@ -5,7 +5,7 @@
 
 import argparse
 from collections import defaultdict
-import html.parser as htmlparser
+import html.parser
 import numpy as np
 import operator
 import os
@@ -19,13 +19,12 @@ import re
 import socket
 import sys
 import time
-import pprint
 
 curDirectory = os.path.dirname(os.path.abspath(__file__))
 
-class MyHTMLParser(htmlparser.HTMLParser):
+class MyHTMLParser(html.parser.HTMLParser):
     def __init__(self):
-        htmlparser.HTMLParser.__init__(self)
+        html.parser.HTMLParser.__init__(self)
         self.data = []
 
     def handle_data(self, data):
@@ -121,8 +120,8 @@ class FantasyWorldSimulator:
         self.sock.sendall("begin adventure")
         self.Restart()
 
-        with open(file_actionId, "r") as infile:
-            self.list_actions = list(pickle.load(infile))
+        with open(file_actionId, "rb") as infile:
+            self.list_actions = list(pickle.load(infile, encoding='utf-8'))
 
     def Restart(self):
         data = self.sock.recv(5000)
@@ -174,13 +173,6 @@ class SavingJohnSimulator:
         self.storyNode = None
         self.Restart()
 
-    def Print(self):
-        f1 = open('story.txt', 'a')
-        f1.write(str(self.storyPlot))
-
-        pp = pprint.PrettyPrinter()
-        pp.pprint(self.storyPlot)
-
     def Restart(self):
         self.tiddler = self.startTiddler
         self.storyNode = self.storyPlot[self.tiddler]
@@ -189,7 +181,7 @@ class SavingJohnSimulator:
     def Read(self):
         if self.storyNode.text.startswith("A wet strand of hair hinders my vision and I'm back in the water."):
             if self.doShuffle:
-                self.idxShuffle = list(range(2))
+                self.idxShuffle = range(2)
                 random.shuffle(self.idxShuffle)
             idxTemp = 0
             if self.params_path == "Adam": idxTemp = 1
@@ -201,7 +193,7 @@ class SavingJohnSimulator:
             return (self.storyNode.text, [actionsTemp[i] for i in self.idxShuffle] if self.doShuffle else actionsTemp, AssignReward(self.storyNode.text, "savingjohn"))
 
         if self.doShuffle:
-            self.idxShuffle = list(range(len(self.storyNode.actions)))
+            self.idxShuffle = range(len(self.storyNode.actions))
             random.shuffle(self.idxShuffle)
         return (self.storyNode.text, [self.storyNode.actions[i] for i in self.idxShuffle] if self.doShuffle else self.storyNode.actions, AssignReward(self.storyNode.text, "savingjohn"))
 
@@ -439,8 +431,8 @@ class MachineOfDeathSimulator:
         
         self.doParaphrase = doParaphrase
         if self.doParaphrase:
-            actions_orig = [self.myHTMLParser.MyHTMLFilter(line.rstrip()) for line in open(os.path.join(curDirectory, "machineofdeath_originalActions.txt"), "r")]
-            actions_para = [self.myHTMLParser.MyHTMLFilter(line.rstrip()) for line in open(os.path.join(curDirectory, "machineofdeath_paraphrasedActions.txt"), "r")]
+            actions_orig = [self.myHTMLParser.MyHTMLFilter(line.rstrip()) for line in open(os.path.join(curDirectory, "machineofdeath_originalActions.txt"), "rb")]
+            actions_para = [self.myHTMLParser.MyHTMLFilter(line.rstrip()) for line in open(os.path.join(curDirectory, "machineofdeath_paraphrasedActions.txt"), "rb")]
             self.dict_paraphrase = {action_orig: action_para for action_orig, action_para in zip(actions_orig, actions_para)}
 
     def Restart(self):
@@ -455,7 +447,7 @@ class MachineOfDeathSimulator:
         self.text = re.sub("\\n", " ", self.myHTMLParser.MyHTMLFilter(self.text))
         self.actions = [re.sub("\\n", " ", self.myHTMLParser.MyHTMLFilter(action)) for action in self.actions]
         if self.doShuffle:
-            self.idxShuffle = list(range(len(self.actions)))
+            self.idxShuffle = range(len(self.actions))
             random.shuffle(self.idxShuffle)
         if "THE END" in self.text: # the story ends
             self.idxShuffle = []
@@ -2359,22 +2351,22 @@ class MachineOfDeathSimulator:
 def GetSimulator(storyName, doShuffle):
     # this method returns simulator, state/action vocabularies, and the maximum number of actions
     if storyName.lower() == "fantasyworld":
-        with open(os.path.join(curDirectory, "fantasyworld_wordId.pickle"), "r") as infile:
-            dict_wordId = pickle.load(infile)
-        with open(os.path.join(curDirectory, "fantasyworld_actionId.pickle"), "r") as infile:
-            dict_actionId = pickle.load(infile)
+        with open(os.path.join(curDirectory, "fantasyworld_wordId.pickle"), "rb") as infile:
+            dict_wordId = pickle.load(infile, encoding='utf-8')
+        with open(os.path.join(curDirectory, "fantasyworld_actionId.pickle"), "rb") as infile:
+            dict_actionId = pickle.load(infile, encoding='utf-8')
         return FantasyWorldSimulator(os.path.join(curDirectory, "fantasyworld_actionId.pickle")), dict_wordId, dict_actionId, 222 # 35
     if storyName.lower() == "savingjohn":
         with open(os.path.join(curDirectory, "savingjohn_wordId.pickle"), "rb") as infile:
-            dict_wordId = pickle.load(infile)
+            dict_wordId = pickle.load(infile, encoding='utf-8')
         with open(os.path.join(curDirectory, "savingjohn_actionId.pickle"), "rb") as infile:
-            dict_actionId = pickle.load(infile)
+            dict_actionId = pickle.load(infile, encoding='utf-8')
         return SavingJohnSimulator(doShuffle, os.path.join(curDirectory, "savingjohn.pickle")), dict_wordId, dict_actionId, 4
     if storyName.lower() == "machineofdeath":
-        with open(os.path.join(curDirectory, "machineofdeath_wordId.pickle"), "r") as infile:
-            dict_wordId = pickle.load(infile)
-        with open(os.path.join(curDirectory, "machineofdeath_actionId.pickle"), "r") as infile:
-            dict_actionId = pickle.load(infile)
+        with open(os.path.join(curDirectory, "machineofdeath_wordId.pickle"), "rb") as infile:
+            dict_wordId = pickle.load(infile, encoding='utf-8')
+        with open(os.path.join(curDirectory, "machineofdeath_actionId.pickle"), "rb") as infile:
+            dict_actionId = pickle.load(infile, encoding='utf-8')
         return MachineOfDeathSimulator(doShuffle), dict_wordId, dict_actionId, 9
 
 if __name__ == "__main__":
@@ -2390,13 +2382,7 @@ if __name__ == "__main__":
     numStep = 0
     while numEpisode < 10:
         (text, actions, reward) = mySimulator.Read()
-
-        try:
-            print(text, actions, reward)
-        except UnicodeEncodeError:
-            pass
-            # print("One or more characters could not be displayed. Continuing the simulation.")
-
+        print(text, actions, reward)
         if len(actions) == 0 or numStep > 250:
             terminal = True
             mySimulator.Restart()
@@ -2404,25 +2390,13 @@ if __name__ == "__main__":
             numStep = 0
         else:
             terminal = False
-            playerInput = input()
-            # playerInput = random.randint(0, len(actions) - 1)
-            playerIntInput = 0
-            try:
-                playerIntInput = int(playerInput)
-            except ValueError:
-                pass
-                # print("Input invalid, setting it to 0.")
-
-            try:
-                print(actions[playerIntInput])
-            except UnicodeEncodeError:
-                pass
-                # print("One or more characters could not be displayed. Continuing the simulation.")
-
+            # playerInput = input()
+            playerInput = random.randint(0, len(actions) - 1)
+            print(actions[playerInput])
             if mySimulator.title == "FantasyWorld":
                 mySimulator.Act(actions[playerInput]) # for FantasyWorld, Act() takes a string as input
             else:
-                mySimulator.Act(playerIntInput) # playerInput is index of selected actions
+                mySimulator.Act(playerInput) # playerInput is index of selected actions
             numStep += 1
     endTime = time.time()
     print("Duration: " + str(endTime - startTime))
