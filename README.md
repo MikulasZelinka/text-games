@@ -1,8 +1,8 @@
 This is a fork of the [original text-games repository](https://github.com/jvking/text-games).
 
-This version has been modified (slightly) to work with **Python 3.5**. As a result, the Fantasy World is likely not working as its backend uses Python 2.7 (not tested yet though). Saving John and Machine of Death do work.
+This version has been modified (slightly) to work with **Python 3.6**. As a result, the Fantasy World is likely not working as its backend uses Python 2.7 (not tested yet though). Saving John and Machine of Death do work.
 
-To use this text game simulator in [pyfiction](https://github.com/MikulasZelinka/pyfiction), clone this repository and place it in pyfiction/simulators/text_games (note the underscore instead of an hyphen; this can be achieved by cloning the project inside pyfiction/simulators and then renaming the new folder to text_games).
+To use this text game simulator in [pyfiction](https://github.com/MikulasZelinka/pyfiction), simply clone pyfiction with the `--recursive` option (or do `git submodule init && git submodule update`).
 
 Below is the unchanged original readme file.
 
