@@ -431,8 +431,8 @@ class MachineOfDeathSimulator:
         
         self.doParaphrase = doParaphrase
         if self.doParaphrase:
-            actions_orig = [self.myHTMLParser.MyHTMLFilter(line.rstrip()) for line in open(os.path.join(curDirectory, "machineofdeath_originalActions.txt"), "rb")]
-            actions_para = [self.myHTMLParser.MyHTMLFilter(line.rstrip()) for line in open(os.path.join(curDirectory, "machineofdeath_paraphrasedActions.txt"), "rb")]
+            actions_orig = [self.myHTMLParser.MyHTMLFilter(line.rstrip()) for line in open(os.path.join(curDirectory, "machineofdeath_originalActions.txt"), "r")]
+            actions_para = [self.myHTMLParser.MyHTMLFilter(line.rstrip()) for line in open(os.path.join(curDirectory, "machineofdeath_paraphrasedActions.txt"), "r")]
             self.dict_paraphrase = {action_orig: action_para for action_orig, action_para in zip(actions_orig, actions_para)}
 
     def Restart(self):
