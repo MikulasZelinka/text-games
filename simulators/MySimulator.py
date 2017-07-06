@@ -59,6 +59,7 @@ def AssignReward(ending, story = "savingjohn"):
             return(-20)
         if ending.startswith("Even now, she's there for me."):
             return(0)
+        return(-0.1)
     if story.lower() == "machineofdeath":
         if not """THE END""" in ending:
             return(-0.1)
